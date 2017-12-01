@@ -25,7 +25,7 @@ namespace AspNetCoreRateLimit
         /// <summary>
         /// Gets or sets the policy prefix, used to compose the client policy cache key
         /// </summary>
-        public string PolicyPrefix { get; set; } = "base";
+        public string PolicyPrefix { get; set; } = "policy";
 
         /// <summary>
         /// Gets or sets the HTTP Status code returned when rate limiting occurs, by default value is set to 429 (Too Many Requests)

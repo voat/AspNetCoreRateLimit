@@ -26,26 +26,11 @@ namespace AspNetCoreRateLimit.Demo
             services.AddOptions();
             services.AddMemoryCache();
 
-            //configure ip rate limiting middle-ware
-            //services.Configure<IpRateLimitOptions>(Configuration.GetSection("IpRateLimiting"));
-            //services.Configure<IpRateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
-            //services.AddSingleton<IIpPolicyStore, MemoryCacheIpPolicyStore>();
-            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-
-            //configure client rate limiting middleware
-            //services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
-            //services.Configure<ClientRateLimitOptions>(Configuration.GetSection("ClientRateLimiting"));
-            //configure global
-            //services.AddSingleton<IIpAddressParser, ReversProxyIpParser>(); 
+            //configure rate limiting
             services.Configure<RateLimitOptions>(Configuration.GetSection("RateLimitOptions"));
             services.Configure<RateLimitPolicies>(Configuration.GetSection("RateLimitPolicies"));
-            //services.Configure<RateLimitPolicies>(Configuration.GetSection("IpRateLimitPolicies"));
-
             services.AddSingleton<IPolicyStore<RateLimitPolicies>, MemoryCachePolicyStore<RateLimitPolicies>>();
-            //services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
-
-            //var opt = new ClientRateLimitOptions();
-            //ConfigurationBinder.Bind(Configuration.GetSection("ClientRateLimiting"), opt);
+            services.AddSingleton<IRateLimitCounterStore, MemoryCacheRateLimitCounterStore>();
 
             // Add framework services.
             services.AddMvc();
@@ -59,7 +44,7 @@ namespace AspNetCoreRateLimit.Demo
 
             //app.UseIpRateLimiting();
             //app.UseClientRateLimiting();
-            app.UseMiddleware<RateLimitMiddleware>();
+            app.UseRateLimiting();
             
             app.UseMvc();
         }

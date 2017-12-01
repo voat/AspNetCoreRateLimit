@@ -4,13 +4,13 @@ using Newtonsoft.Json;
 
 namespace AspNetCoreRateLimit
 {
-    public class DistributedCacheIpPolicyStore : IIpPolicyStore
+    public class DistributedCachePolicyStore : IPolicyStore<RateLimitPolicies>
     {
         private readonly IDistributedCache _memoryCache;
 
-        public DistributedCacheIpPolicyStore(IDistributedCache memoryCache, 
-            IOptions<IpRateLimitOptions> options = null, 
-            IOptions<IpRateLimitPolicies> policies = null)
+        public DistributedCachePolicyStore(IDistributedCache memoryCache, 
+            IOptions<RateLimitOptions> options = null, 
+            IOptions<RateLimitPolicies> policies = null)
         {
             _memoryCache = memoryCache;
 
