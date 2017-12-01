@@ -15,16 +15,16 @@ namespace AspNetCoreRateLimit
             _memoryCache = memoryCache;
 
             //save client rules defined in appsettings in distributed cache on startup
-            if (options != null && options.Value != null && policies != null && policies.Value != null && policies.Value.ClientRules != null)
+            if (options != null && options.Value != null && policies != null && policies.Value != null && policies.Value.RuleSet != null)
             {
-                foreach (var rule in policies.Value.ClientRules)
+                foreach (var rule in policies.Value.RuleSet)
                 {
-                    Set($"{options.Value.ClientPolicyPrefix}_{rule.ClientId}", new ClientRateLimitPolicy { ClientId = rule.ClientId, Rules = rule.Rules });
+                    Set($"{options.Value.PolicyPrefix}_{rule.Id}", new RateLimitPolicy { Id = rule.Id, Rules = rule.Rules });
                 }
             }
         }
 
-        public void Set(string id, ClientRateLimitPolicy policy)
+        public void Set(string id, RateLimitPolicy policy)
         {
             _memoryCache.SetString(id, JsonConvert.SerializeObject(policy));
         }
@@ -35,12 +35,12 @@ namespace AspNetCoreRateLimit
             return !string.IsNullOrEmpty(stored);
         }
 
-        public ClientRateLimitPolicy Get(string id)
+        public RateLimitPolicy Get(string id)
         {
             var stored = _memoryCache.GetString(id);
             if (!string.IsNullOrEmpty(stored))
             {
-                return JsonConvert.DeserializeObject<ClientRateLimitPolicy>(stored);
+                return JsonConvert.DeserializeObject<RateLimitPolicy>(stored);
             }
             return null;
         }

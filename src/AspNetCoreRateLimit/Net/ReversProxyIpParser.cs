@@ -7,18 +7,25 @@ namespace AspNetCoreRateLimit
 {
     public class ReversProxyIpParser : RemoteIpParser
     {
-        private readonly string _realIpHeader;
+        private readonly string[] _realIpHeaders;
 
-        public ReversProxyIpParser(string realIpHeader)
+        /// <summary>
+        /// A header name or a list of headers with a comma seperator
+        /// </summary>
+        /// <param name="realIpHeaders"></param>
+        public ReversProxyIpParser(string realIpHeaders)
         {
-            _realIpHeader = realIpHeader;
+            _realIpHeaders = realIpHeaders.Split(new [] { "," }, StringSplitOptions.RemoveEmptyEntries );
         }
 
         public override IPAddress GetClientIp(HttpContext context)
         {
-            if (context.Request.Headers.Keys.Contains(_realIpHeader, StringComparer.CurrentCultureIgnoreCase))
+            foreach (string headerName in _realIpHeaders)
             {
-                return ParseIp(context.Request.Headers[_realIpHeader].Last());
+                if (context.Request.Headers.Keys.Contains(headerName, StringComparer.CurrentCultureIgnoreCase))
+                {
+                    return ParseIp(context.Request.Headers[headerName].Last());
+                }
             }
 
             return base.GetClientIp(context);

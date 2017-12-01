@@ -1,10 +1,10 @@
 ﻿namespace AspNetCoreRateLimit
 {
-    public interface IIpPolicyStore
+    public interface IIpPolicyStore : IPolicyStore<RateLimitPolicies>
     {
-        bool Exists(string id);
-        IpRateLimitPolicies Get(string id);
-        void Remove(string id);
-        void Set(string id, IpRateLimitPolicies policy);
+        //bool Exists(string id);
+        //RateLimitPolicies Get(string id);
+        //void Remove(string id);
+        //void Set(string id, RateLimitPolicies policy);
     }
 }

@@ -12,7 +12,7 @@ namespace AspNetCoreRateLimit.Tests
     {
         private const string apiPath = "/aPi/ClienTs";
         private const string apiRateLimitPath = "/api/ClientRateLimit";
-        private const string ip = "::1";
+        private const string ip = "255.0.0.10";
 
         public ClientRateLimitTests(RateLimitFixture<Demo.Startup> fixture)
         {
@@ -105,7 +105,6 @@ namespace AspNetCoreRateLimit.Tests
             var clientId = "cl-key-2";
             int responseStatusCode = 0;
             
-
             // Act    
             for (int i = 0; i < 4; i++)
             {
@@ -119,7 +118,6 @@ namespace AspNetCoreRateLimit.Tests
 
             // Assert
             Assert.NotEqual(429, responseStatusCode);
-            
         }
 
         [Fact]

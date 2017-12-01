@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>ASP.NET Core rate limiting middleware</Description>
+    <VersionPrefix>1.0.5</VersionPrefix>
+    <Authors>Stefan Prodan</Authors>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyName>AspNetCoreRateLimit</AssemblyName>
+    <PackageId>AspNetCoreRateLimit</PackageId>
+    <PackageTags>aspnetcore;rate-limit;throttle</PackageTags>
+    <PackageProjectUrl>https://github.com/stefanprodan/AspNetCoreRateLimit</PackageProjectUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/stefanprodan/AspNetCoreRateLimit</RepositoryUrl>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+</Project>

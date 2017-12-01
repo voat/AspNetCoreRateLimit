@@ -5,28 +5,38 @@ namespace AspNetCoreRateLimit
 {
     public class RateLimitCore
     {
-        private readonly RateLimitCoreOptions _options;
+        private readonly RateLimitOptions _options;
         private readonly IRateLimitCounterStore _counterStore;
-        private readonly bool _ipRateLimiting;
-
+        private readonly IIpAddressParser _ipParser;
         private static readonly object _processLocker = new object();
+        private readonly IPolicyStore<RateLimitPolicies> _policyStore;
+        public RateLimitOptions Options => _options;
 
-        public RateLimitCore(bool ipRateLimiting,
-            RateLimitCoreOptions options,
-           IRateLimitCounterStore counterStore)
+        public IIpAddressParser IpParser => _ipParser;
+
+        public IPolicyStore<RateLimitPolicies> PolicyStore => _policyStore;
+
+        public RateLimitCore(
+           RateLimitOptions options,
+           IRateLimitCounterStore counterStore,
+           IPolicyStore<RateLimitPolicies> policyStore,
+           IIpAddressParser ipParser)
         {
-            _ipRateLimiting = ipRateLimiting;
             _options = options;
             _counterStore = counterStore;
+            _policyStore = policyStore;
+            _ipParser = ipParser;
+            
         }
 
-        public string ComputeCounterKey(ClientRequestIdentity requestIdentity, RateLimitRule rule)
+        public string ComputeCounterKey(RequestIdentity requestIdentity, RateLimitRule rule)
         {
-            var key = _ipRateLimiting ? 
-                $"{_options.RateLimitCounterPrefix}_{requestIdentity.ClientIp}_{rule.Period}" :
-                $"{_options.RateLimitCounterPrefix}_{requestIdentity.ClientId}_{rule.Period}";
+            var key = $"{_options.RateLimitCounterPrefix}_{requestIdentity.UniqueId}_{rule.Period}";
+            //var key = _ipRateLimiting ?
+            //   $"{_options.RateLimitCounterPrefix}_{requestIdentity.ClientIp}_{rule.Period}" :
+            //   $"{_options.RateLimitCounterPrefix}_{requestIdentity.ClientId}_{rule.Period}";
 
-            if(_options.EnableEndpointRateLimiting)
+            if (_options.EnableEndpointRateLimiting)
             {
                 key += $"_{requestIdentity.HttpVerb}_{requestIdentity.Path}";
 
@@ -46,7 +56,7 @@ namespace AspNetCoreRateLimit
             return BitConverter.ToString(hashBytes).Replace("-", string.Empty);
         }
 
-        public RateLimitCounter ProcessRequest(ClientRequestIdentity requestIdentity, RateLimitRule rule)
+        public RateLimitCounter ProcessRequest(RequestIdentity requestIdentity, RateLimitRule rule)
         {
             var counter = new RateLimitCounter
             {
@@ -84,7 +94,7 @@ namespace AspNetCoreRateLimit
             return counter;
         }
 
-        public RateLimitHeaders GetRateLimitHeaders(ClientRequestIdentity requestIdentity, RateLimitRule rule)
+        public RateLimitHeaders GetRateLimitHeaders(RequestIdentity requestIdentity, RateLimitRule rule)
         {
             var headers = new RateLimitHeaders();
             var counterId = ComputeCounterKey(requestIdentity, rule);

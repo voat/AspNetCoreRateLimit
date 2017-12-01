@@ -5,27 +5,28 @@ using System.Collections.Generic;
 
 namespace AspNetCoreRateLimit
 {
-    public class MemoryCacheClientPolicyStore : IClientPolicyStore
+    public class MemoryCachePolicyStore<T> : IPolicyStore<T> where T : RateLimitPolicies
     {
         private readonly IMemoryCache _memoryCache;
 
-        public MemoryCacheClientPolicyStore(IMemoryCache memoryCache, 
-            IOptions<ClientRateLimitOptions> options = null, 
-            IOptions<ClientRateLimitPolicies> policies = null)
+        public MemoryCachePolicyStore(IMemoryCache memoryCache, 
+            IOptions<RateLimitOptions> options = null, 
+            IOptions<RateLimitPolicies> policies = null)
         {
             _memoryCache = memoryCache;
-
             //save client rules defined in appsettings in cache on startup
             if(options != null && options.Value != null && policies != null && policies.Value != null && policies.Value.RuleSet != null)
             {
-                foreach (var rule in policies.Value.RuleSet)
-                {
-                    Set($"{options.Value.PolicyPrefix}_{rule.Id}", new RateLimitPolicy { Id = rule.Id, Rules = rule.Rules });
-                }
+                Set($"{options.Value.PolicyPrefix}", (T)policies.Value);
+                //foreach (var rule in policies.Value.RuleSet)
+                //{
+                //    //throw new NotImplementedException();
+                //    //Set($"{options.Value.PolicyPrefix}_{rule.Id}", new RateLimitPolicy { Id = rule.Id, Rules = rule.Rules });
+                //}
             }
         }
 
-        public void Set(string id, RateLimitPolicy policy)
+        public void Set(string id, T policy)
         {
             _memoryCache.Set(id, policy);
         }
@@ -36,9 +37,9 @@ namespace AspNetCoreRateLimit
             return _memoryCache.TryGetValue(id, out stored);
         }
 
-        public RateLimitPolicy Get(string id)
+        public T Get(string id)
         {
-            RateLimitPolicy stored;
+            T stored;
             if (_memoryCache.TryGetValue(id, out stored))
             {
                 return stored;

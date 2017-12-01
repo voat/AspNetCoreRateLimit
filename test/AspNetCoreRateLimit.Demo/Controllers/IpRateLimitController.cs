@@ -11,29 +11,29 @@ namespace AspNetCoreRateLimit.Demo.Controllers
     [Route("api/[controller]")]
     public class IpRateLimitController : Controller
     {
-        private readonly IpRateLimitOptions _options;
-        private readonly IIpPolicyStore _ipPolicyStore;
+        private readonly RateLimitOptions _options;
+        private readonly IPolicyStore<RateLimitPolicies> _ipPolicyStore;
 
-        public IpRateLimitController(IOptions<IpRateLimitOptions> optionsAccessor, IIpPolicyStore ipPolicyStore)
+        public IpRateLimitController(IOptions<RateLimitOptions> optionsAccessor, IPolicyStore<RateLimitPolicies> policyStore)
         {
             _options = optionsAccessor.Value;
-            _ipPolicyStore = ipPolicyStore;
+            _ipPolicyStore = policyStore;
         }
 
         [HttpGet]
-        public IpRateLimitPolicies Get()
+        public RateLimitPolicies Get()
         {
-            return _ipPolicyStore.Get(_options.IpPolicyPrefix);
+            return _ipPolicyStore.Get(_options.PolicyPrefix);
         }
 
         [HttpPost]
         public void Post()
         {
-            var pol = _ipPolicyStore.Get(_options.IpPolicyPrefix);
+            var pol = _ipPolicyStore.Get(_options.PolicyPrefix);
 
-            pol.IpRules.Add(new IpRateLimitPolicy
+            pol.RuleSet.Add(new RateLimitPolicy
             {
-                Ip = "8.8.4.4",
+                Id = "8.8.4.4",
                 Rules = new List<RateLimitRule>(new RateLimitRule[] {
                     new RateLimitRule {
                         Endpoint = "*:/api/testupdate",
@@ -42,7 +42,7 @@ namespace AspNetCoreRateLimit.Demo.Controllers
                 })
             });
 
-            _ipPolicyStore.Set(_options.IpPolicyPrefix, pol);
+            _ipPolicyStore.Set(_options.PolicyPrefix, pol);
         }
     }
 }

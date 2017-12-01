@@ -16,27 +16,26 @@ namespace AspNetCoreRateLimit
             _memoryCache = memoryCache;
 
             //save ip rules defined in appsettings in cache on startup
-            if (options != null && options.Value != null && policies != null && policies.Value != null && policies.Value.IpRules != null)
+            if (options != null && options.Value != null && policies != null && policies.Value != null && policies.Value.RuleSet != null)
             {
-                Set($"{options.Value.IpPolicyPrefix}", policies.Value);
-
+                Set($"{options.Value.PolicyPrefix}", policies.Value);
             }
         }
 
-        public void Set(string id, IpRateLimitPolicies policy)
+        public void Set(string id, RateLimitPolicies policy)
         {
             _memoryCache.Set(id, policy);
         }
 
         public bool Exists(string id)
         {
-            IpRateLimitPolicies stored;
+            RateLimitPolicies stored;
             return _memoryCache.TryGetValue(id, out stored);
         }
 
-        public IpRateLimitPolicies Get(string id)
+        public RateLimitPolicies Get(string id)
         {
-            IpRateLimitPolicies stored;
+            RateLimitPolicies stored;
             if (_memoryCache.TryGetValue(id, out stored))
             {
                 return stored;

@@ -9,52 +9,34 @@ namespace AspNetCoreRateLimit
     {
         public static bool ContainsIp(string rule, string clientIp)
         {
-            var ip = ParseIp(clientIp);
-
-            var range = new IpAddressRange(rule);
-            if (range.Contains(ip))
-            {
-                return true;
-            }
-
-            return false;
+            return ContainsIp(new[] { rule }, clientIp);
         }
 
-        public static bool ContainsIp(List<string> ipRules, string clientIp)
+        public static bool ContainsIp(IEnumerable<string> ipRules, string clientIp)
         {
-            var ip = ParseIp(clientIp);
-            if (ipRules != null && ipRules.Any())
-            {
-                foreach (var rule in ipRules)
-                {
-                    var range = new IpAddressRange(rule);
-                    if (range.Contains(ip))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
+            var rule = "";
+            return ContainsIp(ipRules, clientIp, out rule);
         }
 
-        public static bool ContainsIp(List<string> ipRules, string clientIp, out string rule)
+        public static bool ContainsIp(IEnumerable<string> ipRules, string clientIp, out string rule)
         {
             rule = null;
-            var ip = ParseIp(clientIp);
-            if (ipRules != null && ipRules.Any())
+            if (!String.IsNullOrEmpty(clientIp))
             {
-                foreach (var r in ipRules)
+                var ip = ParseIp(clientIp);
+                if (ipRules != null && ipRules.Any())
                 {
-                    var range = new IpAddressRange(r);
-                    if (range.Contains(ip))
+                    foreach (var r in ipRules)
                     {
-                        rule = r;
-                        return true;
+                        var range = new IpAddressRange(r);
+                        if (range.Contains(ip))
+                        {
+                            rule = r;
+                            return true;
+                        }
                     }
                 }
             }
-
             return false;
         }
 
