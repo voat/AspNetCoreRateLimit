@@ -189,5 +189,30 @@ namespace AspNetCoreRateLimit.Tests
             // Assert
             Assert.Contains(keyword, content);
         }
+
+        [Theory]
+        [InlineData("GET")]
+        [InlineData("PUT")]
+        public async Task NonMonitoredEndpointTest(string verb)
+        {
+            // Arrange
+            var clientId = "cl-key-1-x";
+            int responseStatusCode = 0;
+
+            // Act    
+            for (int i = 0; i < 4; i++)
+            {
+                var request = new HttpRequestMessage(new HttpMethod(verb), "/notapi/notapi");
+                request.Headers.Add("X-ClientId", clientId);
+                request.Headers.Add("X-Real-IP", ip);
+
+                var response = await Client.SendAsync(request);
+                responseStatusCode = (int)response.StatusCode;
+            }
+
+            // Assert
+            Assert.NotEqual(429, responseStatusCode);
+        }
+
     }
 }

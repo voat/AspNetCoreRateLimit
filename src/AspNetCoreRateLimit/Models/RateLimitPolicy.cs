@@ -8,6 +8,6 @@ namespace AspNetCoreRateLimit
     {
         public string Id { get; set; }
         public IdentityMask Type { get; set; }
-        public List<RateLimitRule> Rules { get; set; }
+        public List<RateLimitRule> Rules { get; set; } = new List<RateLimitRule>();
     }
 }

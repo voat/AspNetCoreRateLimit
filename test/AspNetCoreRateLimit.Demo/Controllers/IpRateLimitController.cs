@@ -29,7 +29,7 @@ namespace AspNetCoreRateLimit.Demo.Controllers
         [HttpPost]
         public void Post()
         {
-            var pol = _ipPolicyStore.Get(_options.PolicyPrefix);
+            var pol = _ipPolicyStore.Get(_options.PolicyPrefix) ?? new RateLimitPolicies();
 
             pol.RuleSet.Add(new RateLimitPolicy
             {

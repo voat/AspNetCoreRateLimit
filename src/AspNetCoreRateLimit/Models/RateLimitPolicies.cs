@@ -12,6 +12,6 @@ namespace AspNetCoreRateLimit
     }
     public class RateLimitPolicies
     {
-        public List<RateLimitPolicy> RuleSet { get; set; }
+        public List<RateLimitPolicy> RuleSet { get; set; } = new List<RateLimitPolicy>();
     }
 }

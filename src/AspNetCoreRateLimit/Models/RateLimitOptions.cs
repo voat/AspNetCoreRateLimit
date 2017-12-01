@@ -16,12 +16,17 @@ namespace AspNetCoreRateLimit
     {
         public List<RateLimitRule> GeneralRules { get; set; }
 
-        public List<string> EndpointWhitelist { get; set; }
+        /// <summary>
+        /// Restricts Rate Limiting to only the matching paths. An empty list is a wildcard.
+        /// </summary>
+        public List<string> MonitoredPaths { get; set; } = new List<string>();
 
-        public List<string> ClientWhitelist { get; set; }
+        public List<string> EndpointWhitelist { get; set; } = new List<string>();
 
-        public List<string> IpWhitelist { get; set; }
-        
+        public List<string> ClientWhitelist { get; set; } = new List<string>();
+
+        public List<string> IpWhitelist { get; set; } = new List<string>();
+
         /// <summary>
         /// Gets or sets the policy prefix, used to compose the client policy cache key
         /// </summary>

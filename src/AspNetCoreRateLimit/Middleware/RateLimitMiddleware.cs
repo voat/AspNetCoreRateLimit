@@ -69,63 +69,62 @@ namespace AspNetCoreRateLimit
         public async Task Invoke(HttpContext httpContext)
         {
             // check if rate limiting is enabled
-            if (_options == null)
+            if (_options != null)
             {
-                await _next.Invoke(httpContext);
-                return;
-            }
-
-            // compute identity from request
-            var identity = SetIdentity(httpContext);
-
-            // check white list
-            if (_processor.IsWhitelisted(identity))
-            {
-                await _next.Invoke(httpContext);
-                return;
-            }
-
-            var rules = _processor.GetMatchingRules(identity);
-
-            foreach (var rule in rules)
-            {
-                if (rule.Limit > 0)
+                if (!_options.MonitoredPaths.Any() || EndPoint.HasMatch(_options.MonitoredPaths, httpContext.Request))
                 {
-                    // increment counter
-                    var counter = _processor.ProcessRequest(identity, rule);
+                    // compute identity from request
+                    var identity = SetIdentity(httpContext);
 
-                    // check if key expired
-                    if (counter.Timestamp + rule.PeriodTimespan.Value < DateTime.UtcNow)
+                    // check white list
+                    if (_processor.IsWhitelisted(identity))
                     {
-                        continue;
+                        await _next.Invoke(httpContext);
+                        return;
                     }
 
-                    // check if limit is reached
-                    if (counter.TotalRequests > rule.Limit)
+                    var rules = _processor.GetMatchingRules(identity);
+
+                    foreach (var rule in rules)
                     {
-                        //compute retry after value
-                        var retryAfter = _processor.RetryAfterFrom(counter.Timestamp, rule);
+                        if (rule.Limit > 0)
+                        {
+                            // increment counter
+                            var counter = _processor.ProcessRequest(identity, rule);
 
-                        // log blocked request
-                        LogBlockedRequest(httpContext, identity, counter, rule);
+                            // check if key expired
+                            if (counter.Timestamp + rule.PeriodTimespan.Value < DateTime.UtcNow)
+                            {
+                                continue;
+                            }
 
-                        // break execution
-                        await ReturnQuotaExceededResponse(httpContext, rule, retryAfter);
-                        return;
+                            // check if limit is reached
+                            if (counter.TotalRequests > rule.Limit)
+                            {
+                                //compute retry after value
+                                var retryAfter = _processor.RetryAfterFrom(counter.Timestamp, rule);
+
+                                // log blocked request
+                                LogBlockedRequest(httpContext, identity, counter, rule);
+
+                                // break execution
+                                await ReturnQuotaExceededResponse(httpContext, rule, retryAfter);
+                                return;
+                            }
+                        }
+                    }
+
+                    //set X-Rate-Limit headers for the longest period
+                    if (rules.Any() && !_options.DisableRateLimitHeaders)
+                    {
+                        var rule = rules.OrderByDescending(x => x.PeriodTimespan.Value).First();
+                        var headers = _processor.GetRateLimitHeaders(identity, rule);
+                        headers.Context = httpContext;
+
+                        httpContext.Response.OnStarting(SetRateLimitHeaders, state: headers);
                     }
                 }
             }
-
-            //set X-Rate-Limit headers for the longest period
-            if (rules.Any() && !_options.DisableRateLimitHeaders)
-            {
-                var rule = rules.OrderByDescending(x => x.PeriodTimespan.Value).First();
-                var headers = _processor.GetRateLimitHeaders(identity, rule);
-                headers.Context = httpContext;
-
-                httpContext.Response.OnStarting(SetRateLimitHeaders, state: headers);
-            }
-
             await _next.Invoke(httpContext);
         }
         public virtual void LogBlockedRequest(HttpContext httpContext, RequestIdentity identity, RateLimitCounter counter, RateLimitRule rule)

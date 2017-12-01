@@ -30,8 +30,9 @@ namespace AspNetCoreRateLimit.Demo.Controllers
         public void Post()
         {
             //var id = $"{_options.PolicyPrefix}_cl-key-1";
-            var policies = _policyStore.Get($"{_options.PolicyPrefix}");
-            var anonPolicy = policies?.RuleSet.Where(x => x.Id == "cl-key-1").FirstOrDefault();
+            var policies = _policyStore.Get($"{_options.PolicyPrefix}") ?? new RateLimitPolicies();
+            var anonPolicy = policies?.RuleSet.Where(x => x.Id == "cl-key-1").FirstOrDefault() ?? new RateLimitPolicy() { Id = "cl-key-1", Type = IdentityMask.Id };
+
             anonPolicy.Rules.Add(new RateLimitRule
             {
                 Endpoint = "*/api/testpolicyupdate",

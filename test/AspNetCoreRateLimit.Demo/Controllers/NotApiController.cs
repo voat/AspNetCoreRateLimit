@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AspNetCoreRateLimit.Demo.Controllers
 {
-    [Route("api/[controller]")]
-    public class ClientsController : Controller
+    [Route("notapi/[controller]")]
+    public class NotApiController : Controller
     {
         // GET api/values
         [HttpGet]
