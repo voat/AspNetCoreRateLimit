@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,7 @@ namespace AspNetCoreRateLimit
 {
     public class ReversProxyIpParser : RemoteIpParser
     {
-        private readonly string[] _realIpHeaders;
+        private readonly IEnumerable<string> _realIpHeaders;
 
         /// <summary>
         /// A header name or a list of headers with a comma seperator
@@ -15,7 +16,7 @@ namespace AspNetCoreRateLimit
         /// <param name="realIpHeaders"></param>
         public ReversProxyIpParser(string realIpHeaders)
         {
-            _realIpHeaders = realIpHeaders.Split(new [] { "," }, StringSplitOptions.RemoveEmptyEntries );
+            _realIpHeaders = realIpHeaders.Split(new [] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries ).Select(x => x.Trim());
         }
 
         public override IPAddress GetClientIp(HttpContext context)

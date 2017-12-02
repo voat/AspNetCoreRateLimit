@@ -4,6 +4,7 @@ namespace AspNetCoreRateLimit
 {
     public class RateLimitRule
     {
+        private string _period = "0s";
         /// <summary>
         /// HTTP verb and path 
         /// </summary>
@@ -17,9 +18,15 @@ namespace AspNetCoreRateLimit
         /// <summary>
         /// Rate limit period as in 1s, 1m, 1h
         /// </summary>
-        public string Period { get; set; }
+        public string Period {
+            get => _period;
+            set {
+                PeriodTimespan = value.ConvertToTimeSpan();
+                _period = value;
+            }
+        }
 
-        public TimeSpan? PeriodTimespan { get; set; }
+        public TimeSpan PeriodTimespan { get; private set; } = TimeSpan.Zero;
 
         /// <summary>
         /// Maximum number of requests that a client can make in a defined period

@@ -85,11 +85,11 @@ namespace AspNetCoreRateLimit
                 }
             }
 
-            foreach (var item in limits)
-            {
-                //parse period text into time spans
-                item.PeriodTimespan = ConvertToTimeSpan(item.Period);
-            }
+            //foreach (var item in limits)
+            //{
+            //    //parse period text into time spans
+            //    item.PeriodTimespan = ConvertToTimeSpan(item.Period);
+            //}
 
             limits = limits.OrderBy(l => l.PeriodTimespan).ToList();
             if (Options.StackBlockedRequests)

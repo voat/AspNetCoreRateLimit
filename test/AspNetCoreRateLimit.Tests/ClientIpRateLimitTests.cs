@@ -22,7 +22,7 @@ namespace AspNetCoreRateLimit.Tests
 
         [Theory]
         [InlineData("GET")]
-        //[InlineData("PUT")]
+        [InlineData("PUT")]
         public async Task SpecificClientRule(string verb)
         {
             // Arrange
